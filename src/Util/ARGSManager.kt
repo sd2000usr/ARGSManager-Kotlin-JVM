@@ -5,6 +5,7 @@ class ARGSManager
     companion object
     {
         private val argRequests = mutableMapOf<String, () -> Unit>()
+        private var onArgRequestUnAssignedFoundEvent: (arg: String) -> Unit = {}
 
         /**
          * argRequest | argValue
@@ -15,14 +16,18 @@ class ARGSManager
             val argsValues = mutableListOf<String>()
             args.forEach()
             {
-                if (it.startsWith("-")) { if (argRequests.containsKey(it)) argRequests[it]!!.invoke() else println("[Alert] {ARGSManager} {managerArgs} action for argRequest: $it, not found") }
+                if (it.startsWith("-")) { if (argRequests.containsKey(it)) argRequests[it]!!.invoke() else onArgRequestUnAssignedFoundEvent(it) }
                 else argsValues.add(it)
             }
 
             action(argsValues)
         }
 
-        fun onArg(arg: String, action: () -> Unit) = argRequests.put(arg, action)
+        fun onArgRequestFound(arg: String, action: () -> Unit) = argRequests.put(arg, action)
+        fun onArgRequestUnAssignedFound(arg: String, action: (arg: String) -> Unit) = run { onArgRequestUnAssignedFoundEvent = action }
+
+
+
 
     }
 }
